@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ==========================================
+    // ADMIN COLLECTION - Admin ro'yxati
+    // ==========================================
+    match /admins/{userId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Faqat manual yaratiladi
+    }
+    
+    // ==========================================
+    // SO'ROVNOMALAR - Admin panel uchun
+    // ==========================================
+    match /surveys/{surveyId} {
+      // Hamma o'qiy oladi (mobil ilova uchun)
+      allow read: if true;
+      
+      // MVP: Authenticated users yoza oladi
+      // Production: isAdmin() ni qaytarish kerak
+      allow write: if request.auth != null;
+      // Future: allow write: if isAdmin();
+      
+      match /questions/{questionId} {
+        allow read: if true;
+        allow write: if request.auth != null;
+      }
+    }
+    
+    // ==========================================
+    // ANONIM OVOZLAR - Hech kim o'qiy olmaydi
+    // ==========================================
+    match /votes/{voteId} {
+      // Faqat yozish mumkin, o'qish yo'q (anonim)
+      allow read: if false;
+      // MVP: Anonim ovoz berish (auth shart emas)
+      allow create: if validVote();
+      allow update, delete: if false;
+    }
+    
+    // ==========================================
+    // RESPONSES - Survey javoblari to'plami
+    // ==========================================
+    match /responses/{responseId} {
+      // Mobil ilova javoblarni yozadi
+      allow read: if false; // Hech kim o'qiy olmaydi
+      allow create: if validResponse();
+      allow update, delete: if false;
+    }
+    
+    // ==========================================
+    // QATNASHGANLAR - Duplicate prevention
+    // ==========================================
+    match /participants/{participantId} {
+      // Tekshirish uchun o'qish
+      allow read: if true;
+      // Bir marta yozish
+      allow create: if true;
+      allow update, delete: if false;
+    }
+    
+    // ==========================================
+    // NATIJALAR - Faqat umumiy statistika
+    // ==========================================
+    match /results/{surveyId} {
+      allow read: if true;
+      allow write: if false; // Faqat Cloud Functions orqali
+    }
+    
+    // ==========================================
+    // YORDAMCHI FUNKSIYALAR
+    // ==========================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      // Admin kolleksiyasida mavjudligini tekshirish
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    function validVote() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['surveyId', 'questionId', 'answerHash', 'timestamp']) &&
+             data.surveyId is string &&
+             data.answerHash is string;
+    }
+    
+    function validResponse() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['surveyId', 'answers', 'timestamp']) &&
+             data.surveyId is string &&
+             data.answers is map &&
+             data.timestamp is number;
+    }
+  }
+}

@@ -1,0 +1,9 @@
+## Nima qilish kerak?
+...
+
+## Qabul qilish mezonlari
+- [ ] ...
+- [ ] ...
+
+## Qo‘shimcha
+- Screenshot / link
