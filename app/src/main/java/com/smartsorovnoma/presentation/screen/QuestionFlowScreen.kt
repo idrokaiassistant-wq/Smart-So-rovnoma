@@ -192,10 +192,10 @@ fun QuestionFlowScreen(
                             )
                             
                             // Error message
-                            if (uiState.currentError != null) {
+                            uiState.currentError?.let { error ->
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
-                                    text = uiState.currentError!!,
+                                    text = error,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )

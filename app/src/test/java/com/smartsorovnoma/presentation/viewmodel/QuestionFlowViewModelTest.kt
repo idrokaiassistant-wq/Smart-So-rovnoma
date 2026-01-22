@@ -38,10 +38,11 @@ class QuestionFlowViewModelTest {
     
     @Test
     fun `goNext with valid answer should move to next question`() {
-        val firstQuestion = viewModel.getCurrentQuestion()!!
+        val firstQuestion = viewModel.getCurrentQuestion()
+        assertNotNull("First question should not be null", firstQuestion)
         
         // Javob berish
-        viewModel.updateAnswer(firstQuestion.id, AnswerValue.Text("Test javob"))
+        viewModel.updateAnswer(firstQuestion!!.id, AnswerValue.Text("Test javob"))
         
         // Keyingiga o'tish
         val result = viewModel.goNext()
