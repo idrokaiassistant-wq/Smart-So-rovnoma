@@ -108,8 +108,7 @@ fun SurveyDetailScreen(
                 .padding(Dimens.md),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (survey != null) {
-                val surveyData = survey!! // Local copy for smart cast
+            survey?.let { surveyData ->
                 // Main info card
                 AppCard(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(Dimens.lg)) {
@@ -182,7 +181,7 @@ fun SurveyDetailScreen(
                 )
                 
                 Spacer(modifier = Modifier.height(Dimens.md))
-            } else {
+            } ?: run {
                 Text(
                     text = stringResource(R.string.survey_not_found),
                     style = MaterialTheme.typography.bodyLarge,

@@ -21,6 +21,9 @@ google-services.json
 local.properties
 *.keystore
 *.jks
+.env.local
+.env
+!.env.example
 
 # Tooling
 .trae

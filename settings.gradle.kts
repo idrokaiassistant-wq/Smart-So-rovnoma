@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SmartSorovnoma"
 include(":app")
+include(":admin-app")
